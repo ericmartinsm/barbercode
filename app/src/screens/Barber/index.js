@@ -2,28 +2,48 @@ import React, { useState, useEffect } from 'react';
 import { Text } from 'react-native';
 import Swiper from 'react-native-swiper';
 import Stars from '../../components/Stars';
+import BarberModal from '../../components/BarberModal'
 import FavoriteIcon from '../../assets/favorite.svg';
+import FavoriteFullIcon from '../../assets/favorite_full.svg';
 import BackIcon from '../../assets/back.svg'
+import NavPrevIcon from '../../assets/nav_prev.svg'
+import NavNextIcon from '../../assets/nav_next.svg'
 
 import { useNavigation, useRoute } from '@react-navigation/native'
 import {
     Container,
     Scroller,
-    FakeSwiper,
     PageBody,
-    UserInfoArea,
-    ServiceArea,
-    TestimonialArea,
+    BackButton,
+    LoadingIcon,
+
     SwipeDot,
     SwipeDotActive,
     SwipeItem,
     SwipeImage,
+    FakeSwiper,
+
+    UserInfoArea,
     UserAvatar,
     UserInfo,
     UserInfoName,
     UserFavButton,
-    BackButton,
-    
+
+    ServiceArea,
+    ServiceItem,
+    ServiceInfo,
+    ServiceName,
+    ServicesTitle,
+    ServicePrice,
+    ServiceChooseButton,
+    ServiceChooseBtnText,
+
+    TestimonialArea,
+    TestimonialItem,
+    TestimonialInfo,
+    TestimonialName,
+    TestimonialBody,
+
 
 } from './styles';
 
@@ -44,6 +64,12 @@ export default () => {
 
     const [loading, setLoading] = useState(false);
 
+    const [favorited, setFavorited] = useState(false);
+
+    const [selectedService, setSelectedService] = useState(null);
+
+    const [showModal, setShowModal] = useState(false);
+
 
     useEffect(() => { //hooks, assim que entrar na tela vai executar
         const getBarberInfo = async () => {
@@ -51,6 +77,7 @@ export default () => {
             let json = await Api.getBarber(userInfo.id);
             if (json.error == '') {
                 setUserInfo(json.data);
+                setFavorited(json.data.favorited);
             } else {
                 alert('error:' + json.error)
             }
@@ -59,49 +86,107 @@ export default () => {
         getBarberInfo();
     }, [])
 
-    const handleBackButton = () =>{
-        
+    const handleBackButton = () => {
+        navigation.goBack(); // função do react.navigation que volta na pagina anterior
+    }
+    const handleFavClick = () => {
+        setFavorited(!favorited);
+        // Api.setFavorite( userInfo.id);
+    }
+    const handleServiceChoose = (key) => {
+        setSelectedService(key);
+        setShowModal(true);
     }
 
     return (
         <Container>
             <Scroller>
                 {userInfo.photos && userInfo.photos.length > 0 ?
-                    <Swiper 
-                    
-                    style={{height:240}}
-                    dot={<SwipeDot/>}
-                    activeDot={<SwipeDotActive/>}
-                    paginationStyle={{top:15, right: 15,Bottom: null, left: null}}
-                    autoplay={true} //vai rocar de foto automaticamente
+                    <Swiper
+
+                        style={{ height: 240 }}
+                        dot={<SwipeDot />}
+                        activeDot={<SwipeDotActive />}
+                        paginationStyle={{ top: 15, right: 15, Bottom: null, left: null }}
+                        autoplay={true} //vai rocar de foto automaticamente
                     >
-                        {userInfo.photos.map((item, key)=>(
+                        {userInfo.photos.map((item, key) => (
                             <SwipeItem key={key}>
-                                <SwipeImage source={{uri:item.url}} resizeMode="cover" />
+                                <SwipeImage source={{ uri: item.url }} resizeMode="cover" />
                             </SwipeItem>
 
                         ))}
                     </Swiper>
                     :
-                    <FakeSwiper></FakeSwiper>
+                    <FakeSwiper></FakeSwiper> // será inserido enquanto não houver imagem no swipe, para nao quebrar o lay
                 }
                 <PageBody>
                     <UserInfoArea>
-                        <UserAvatar source={{uri:userInfo.avatar}}/>
+                        <UserAvatar source={{ uri: userInfo.avatar }} />
                         <UserInfo>
                             <UserInfoName>{userInfo.name}</UserInfoName>
-                            <Stars stars={userInfo.stars} showNumber={true}/>
+                            <Stars stars={userInfo.stars} showNumber={true} />
                         </UserInfo>
-                        <UserFavButton>
-                            <FavoriteIcon width="24" height="24" fill="#ff0000"/>
+                        <UserFavButton onPress={handleFavClick}>
+                            {favorited ?
+
+                                <FavoriteFullIcon width="24" height="24" fill="#ff0000" />
+
+                                :
+
+                                <FavoriteIcon width="24" height="24" fill="#ff0000" />
+                            }
+
                         </UserFavButton>
                     </UserInfoArea>
-                    <ServiceArea>
 
-                    </ServiceArea>
-                    <TestimonialArea>
+                    {loading &&
+                        <LoadingIcon size="large" color="#000" />
+                    }
 
-                    </TestimonialArea>
+                    {userInfo.services &&
+
+                        <ServiceArea>
+                            <ServicesTitle>Lista de Serviços</ServicesTitle>
+
+                            {userInfo.services.map((item, key) => (
+                                <ServiceItem key={key}>
+                                    <ServiceInfo>
+                                        <ServiceName>{item.name}</ServiceName>
+                                        <ServicePrice>R${item.price.toFixed(2)}</ServicePrice>
+                                    </ServiceInfo>
+                                    <ServiceChooseButton onPress={() => handleServiceChoose(key)}>
+                                        <ServiceChooseBtnText>Agendar</ServiceChooseBtnText>
+                                    </ServiceChooseButton>
+                                </ServiceItem>
+
+                            ))}
+                        </ServiceArea>
+                    }
+                    {userInfo.testimonials && userInfo.testimonials.length > 0 &&
+
+                        <TestimonialArea>
+                            <Swiper
+                                style={{ height: 110 }}
+                                showsPagination={false} //nao mostrar paginacao
+                                showsButtons={true}
+                                prevButton={<NavPrevIcon widht="35" height="35" fill="#000" />}
+                                nextButton={<NavNextIcon widht="35" height="35" fill="#000" />}
+                            >
+                                {userInfo.testimonials.map((item, key) => (
+                                    <TestimonialItem key={key}>
+                                        <TestimonialInfo>
+                                            <TestimonialName>{item.name}</TestimonialName>
+                                            <Stars stars={item.rate} showNumber={false}></Stars>
+                                        </TestimonialInfo>
+                                        <TestimonialBody>{item.body}</TestimonialBody>
+                                    </TestimonialItem>
+                                ))}
+                            </Swiper>
+                        </TestimonialArea>
+
+                    }
+
                 </PageBody>
 
             </Scroller>
@@ -110,6 +195,16 @@ export default () => {
 
                 </BackIcon>
             </BackButton>
+
+            <BarberModal
+                show={showModal}
+                setShow={setShowModal}
+                user={userInfo}
+                service={selectedService}
+            />
+
+
+
         </Container>
     )
 }
