@@ -12,6 +12,15 @@ Aplicação para sintaxe de conhecimento em <strong>REACT NATIVE </strong>
   <li>React Native Svg</li>
 </ul>
 
+# Iniciando o Projeto
+<strong> Necessário AndroidStudio SDK</strong>
+
+No prompt:
+
+<ol>
+  <li>npx react-native start</li>
+  <li>npx react-native run-android</li>
+</ol>
 
 <h3>Prévia</h3>
 
