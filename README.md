@@ -1,2 +1,25 @@
-# barbercode
-App to practice 
+# Barbercode
+Aplicação para sintaxe de conhecimento em <strong>REACT NATIVE </strong>
+
+# Libs usadas
+
+<ul>
+  <li>Styled Components</li>
+  <li>React Navigation</li>
+  <li>Async Storage</li>
+  <li>Geo Location</li>
+  <li>React Native Swiper</li>
+  <li>React Native Svg</li>
+</ul>
+
+
+<h3>Prévia</h3>
+
+![Previa](https://github.com/ericmartinsm/barbercode/blob/main/app/src/gifs/a1.gif)
+![Previa](https://github.com/ericmartinsm/barbercode/blob/main/app/src/gifs/a2.gif)
+![Previa](https://github.com/ericmartinsm/barbercode/blob/main/app/src/gifs/a3.gif)
+![Previa](https://github.com/ericmartinsm/barbercode/blob/main/app/src/gifs/a4.gif)
+
+
+
+
