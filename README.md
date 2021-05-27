@@ -18,6 +18,7 @@ Aplicação para sintaxe de conhecimento em <strong>REACT NATIVE </strong>
 No prompt:
 
 <ol>
+  <li>npm i</li>
   <li>npx react-native start</li>
   <li>npx react-native run-android</li>
 </ol>
