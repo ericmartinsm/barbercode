@@ -1,7 +1,10 @@
-import React, { useState } from 'react';
+import React, { useState , useContext} from 'react';
 import { Container, InputArea, CustomButton, CustomButtonText, SignMessageButton, SignMessageButtonText, SignMessageButtonTextBold } from './styles';
 import { Text } from 'react-native';
-import { useNavigation } from '@react-navigation/native'
+import { useNavigation } from '@react-navigation/native';
+import AsyncStorage from '@react-native-community/async-storage';
+
+import { UserContext} from '../../contexts/UserContext'
 
 import Api from '../../Api';
 
@@ -11,7 +14,7 @@ import EmailIcon from '../../assets/email.svg';
 import LockIcon from '../../assets/lock.svg'
 
 export default () => {
-
+    const { dispatch: userDispatch } = useContext(UserContext) // vai mandar as info para o context
     const navigation = useNavigation();
 
     const [emailField, setEmailField] = useState(''); //onde vai o email digitado pelo usuário para logar
@@ -22,15 +25,28 @@ export default () => {
             routes: [{ name: 'SignUp' }]
         });
     };
-    const handleSignClick = async() => {
-        if(emailField != '' && passwordField != ''){
-            let res = await Api.signIn(emailField, passwordField);
-            if(json.token){
-                alert("Deu Certo")
-            }else{
-                alert("E-maile/ou senha errados!")
+    const handleSignClick = async () => {
+        // console.log("email", emailField)
+        // console.log("passawor", passwordField)
+        if (emailField != '' && passwordField != '') {
+            let json = await Api.signIn(emailField, passwordField);
+            console.log('AAAAAAAAAAAAAAAAAAAAAAAA',json)
+            if (json.token) {
+                await AsyncStorage.setItem('token',json.token); //vai armazenar o toekn do usuário
+                userDispatch({
+                    type: 'setAvatar',
+                    payload:{
+                        avatar: json.data.avatar
+                    }
+                });
+
+                navigation.reset({
+                    routes:[{name:'MainTab'}]
+                });
+            } else {
+                alert("E-mail e/ou senha errados!")
             }
-        }else{
+        } else {
             alert("Preencha os campos!")
         }
     };
